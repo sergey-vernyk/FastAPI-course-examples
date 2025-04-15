@@ -1,4 +1,4 @@
-## Процесс встановлення залежностей та запуску сервера
+## Процес встановлення залежностей та запуску сервера
 
 #### 1. Створити віртуальне оточення:
 ```sh
@@ -10,11 +10,10 @@ python -m venv .venv
 # Linux/Mac
 source .venv/bin/activate
 
-# windows
-# Cmd
+# Windows Cmd
 .venv\Scripts\activate.bat
 
-# PowerShell
+# Windows PowerShell
 .venv\Scripts\Activate.ps1
 
 # Git Bash

@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 
 # pylint: disable=logging-fstring-interpolation
 
+# конфігурація логування і створення логера для модуля
 logging.basicConfig(
     style="{",
     level=logging.INFO,
@@ -31,10 +32,15 @@ logger = logging.getLogger(__name__)
 
 DATABASE_URL = "sqlite:///./test_sync.db"
 
+# створення екземпляра Engine для БД
+# створення синхронної сесії (глобальної)
+# при 'commit' вона продовжує існувати (це необхідно)
+# 'metadata' зберігає дані про таблицю (її поля, типи даних і т.д.)
 engine = create_engine(DATABASE_URL)
 sync_session = Session(engine, expire_on_commit=False)
 metadata = MetaData()
 
+# створення таблиці за допомогою синтаксису SQLAlchemy
 users = Table(
     "users",
     metadata,
@@ -49,6 +55,10 @@ def simulate_io_delay():
     start = time.perf_counter()
     logger.info("Start API request.")
 
+    # синхронний запит на сторонній API із затримкою
+    # затримка 3 секунди, але сам сервіс робить ще якусь затримку
+    # тому інколи є перевищення значення 'timeout' і запит може завершитись помилкою
+    # просто треба заново зробити запит
     response = requests.get("https://httpbin.org/delay/3", timeout=6)
 
     end = time.perf_counter()
@@ -61,11 +71,14 @@ def get_users_from_db(query: Select, session: Session) -> Sequence[RowMapping]:
     start = time.perf_counter()
     logger.info("Start DB query.")
 
+    # виконання запиту в БД та отримання всіх користувачів у вигляді словника
+    # для цього використовується 'mappings()'
     cursor = session.execute(query)
     all_users = cursor.mappings().all()
 
     end = time.perf_counter()
     logger.info(f"End DB query in {end - start:.5f} seconds.")
+    # послідовний виклик задачі запису користувачів в файл
     write_users_to_file(all_users)
     return all_users
 
@@ -75,6 +88,7 @@ def write_users_to_file(users: Sequence[RowMapping]) -> None:
     start = time.perf_counter()
     logger.info("Start writing users to file.")
 
+    # синхронний запис списку користувачів в файл в необхідному форматі
     with open("users_sync.txt", "w", encoding="utf-8") as fp:
         for user in users:
             # формат: "1. Jack (example@example.com)"
@@ -96,6 +110,8 @@ def shutdown() -> None:
     engine.dispose()
 
 
+# звичайні функції 'on_startup' та 'on_shutdown' відповідно запускаються
+# при запуску і при зупинці нашого обє'кту FastAPI
 app = FastAPI(on_startup=[startup], on_shutdown=[shutdown], title="DB Sync")
 
 
@@ -108,9 +124,11 @@ def create_user(user_name: str, email: str):
 
     if existing_user is not None:
         raise HTTPException(
-            status_code=400, detail="User with this name already exists"
+            status_code=400, detail="User with this name already exists."
         )
 
+    # додавання користувача в БД з іменем і поштою
+    # та підтвердження запису через 'commit'
     query = users.insert().values(name=user_name, email=email)
 
     sync_session.execute(query)
