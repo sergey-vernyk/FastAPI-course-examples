@@ -3,7 +3,7 @@ from time import perf_counter
 
 
 async def async_prime_number(number: int) -> bool:
-    """Асинхронна функція для обчислення факторіалу числа."""
+    """Асинхронна функція для перевірки чи передане число просте."""
     if number > 1:
         for num in range(2, number // 2 + 1):
             if number % num == 0:
@@ -14,7 +14,7 @@ async def async_prime_number(number: int) -> bool:
 
 
 def sync_prime_number(number: int):
-    """Синхронна функція для обчислення факторіалу числа."""
+    """Синхронна функція для перевірки чи передане число просте."""
     if number > 1:
         for num in range(2, number // 2 + 1):
             if number % num == 0:
