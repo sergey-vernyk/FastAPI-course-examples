@@ -16,8 +16,8 @@ source .venv/bin/activate
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
 
-# Git Bash
-source .venv/bin/activate
+# Windows Git Bash
+source .venv/Scripts/activate
 ```
 
 #### 3. Встановити залежності:
