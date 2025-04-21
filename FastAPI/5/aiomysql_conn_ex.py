@@ -21,7 +21,7 @@ MYSQL_CONNECTION_DATA = {
 
 
 async def get_connection() -> aiomysql.Connection:
-    """Отримання even loop та та отримання з'єднання до БД."""
+    """Отримання event loop та та отримання з'єднання до БД."""
     # поточний event loop можна не передавати як параметр до "aiomysql.connect"
     # в версії Python 3.10+
     loop = asyncio.get_event_loop()
