@@ -1,10 +1,13 @@
 import asyncio
+import os
 
 import httpx
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 
-# openweathermap.org
-WEATHER_API_KEY = "YOUR_API_KEY"
+load_dotenv(os.path.abspath(f"{os.path.pardir}/.env"))
+
+WEATHER_API_KEY = os.environ.get("OPENWEATHERMAP_API_KEY")
 
 
 app = FastAPI()
