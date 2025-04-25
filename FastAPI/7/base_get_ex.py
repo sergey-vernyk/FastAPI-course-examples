@@ -14,10 +14,9 @@ WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 
 app = FastAPI()
 
-# select * from users limit 10;
+
+# select * from users limit 2;
 # http://127.0.0.1:8000/users/?limit=2
-
-
 @app.get("/users/")
 async def fetch_users(
     limit: int = Query(
