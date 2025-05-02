@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 import aiomysql
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -222,3 +222,41 @@ async def delete_book(book_id: int) -> JSONResponse:
         await connection.ensure_closed()
 
     return JSONResponse("Book has been deleted.", status_code=204)
+
+
+@app.patch("/books/{book_id}")
+async def update_book_partial(book_id: int, update_data: BookUpdate) -> BookInfo:
+    """Часткове оновлення даних книги по `book_id`."""
+    connection = await get_mysql_connection()
+
+    try:
+        async with connection.cursor(aiomysql.DictCursor) as cursor:
+            # перевіряємо наявність в БД книги з переданим ID
+            await cursor.execute("SELECT * FROM books WHERE id=%s;", (book_id,))
+            db_book: dict = await cursor.fetchone()
+
+            if db_book is None:
+                raise HTTPException(404, "Book does not exist.")
+
+            # залишаємо тільки ті дані, які треба оновити
+            updated_item = update_data.model_dump(exclude_unset=True)
+            # формуємо строку із назвами полів для оновлення у вигляді (title=%s, author=%s)
+            set_clauses = ",".join(f"{field}=%s" for field in updated_item.keys())
+            # значення для оновлення
+            values = list(updated_item.values())
+
+            # оновлюємо дані книги
+            await cursor.execute(
+                f"UPDATE books SET {set_clauses} WHERE id=%s;",
+                values + [book_id],
+            )
+            await connection.commit()
+    except aiomysql.Error as e:
+        raise e
+    finally:
+        # в будь-якому випадку закриваємо з'єднання
+        await connection.ensure_closed()
+
+    # оновлюємо дані книги для відповіді
+    db_book.update(**updated_item)
+    return BookInfo(**db_book)
