@@ -3,7 +3,7 @@ import json
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
-app = FastAPI(title="Books API")
+app = FastAPI()
 
 
 # curl -X GET http://127.0.0.1:8000/check_headers/ -H "X-token: secret-token"
