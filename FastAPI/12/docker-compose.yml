@@ -1,0 +1,62 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    container_name: mysql-database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DB}
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    networks:
+      - docker-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    container_name: fastapi-backend
+    # Можемо перевизначити команду запуску сервера із Dockerfile
+    # command: ["uvicorn", "book_api:app", "--host", "0.0.0.0", "--port", "8000"]
+    user: fastapi_user
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - docker-network
+
+  frontend:
+    build:
+      context: ./frontend/frontend-books
+      dockerfile: ./Dockerfile
+    container_name: vue-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - docker-network
+
+volumes:
+  mysql_data:
+
+
+networks:
+  docker-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1452

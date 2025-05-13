@@ -1,0 +1,46 @@
+# Node modules (should be installed inside the image)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Dependency directories
+.bower_components
+jspm_packages
+
+# Local development
+.env
+.env.*        # ignores .env.development, .env.production, etc.
+.vscode
+.idea
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build output (if rebuilding inside Docker)
+dist
+build
+
+# Git
+.git
+.gitignore
+
+# Docker files that don't need to be in the image
+Dockerfile*
+docker-compose*
+
+# Cache
+*.log
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Testing
+coverage
+tests
+__tests__
+
+# Misc
+*.local
+*.lock
