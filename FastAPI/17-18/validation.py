@@ -167,6 +167,7 @@ class BookingRequest(BaseModel):
             raise
 
         # інакше робимо саме потрібну нам перевірку і знову робимо raise
+        # або повертаємо валідний для цієї перевірки об'єкт
         if model.notes and len(model.notes) > 20:
             raise ValueError("Notes field cannot exceed 20 characters.")
 
