@@ -60,7 +60,10 @@ class Participant(BaseModel):
         default=True, description="Автоматична підписка на розсилку."
     )
 
-    @field_validator("name")
+    # може мати mode параметр як 'after' та 'before' ('after' за замовчуванням)
+    # відносно поля 'name' ця перевірка буде відбуватись першою ніж перевірка валідаторів з Field для цього поля
+    # min_length, max_length та інші.
+    @field_validator("name", mode="before")
     @classmethod
     def name_must_be_capitalized(cls, name: str) -> str:
         """Кастомний валідатор на поле ім'я."""
