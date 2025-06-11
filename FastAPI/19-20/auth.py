@@ -15,6 +15,7 @@ from pydantic import BaseModel, EmailStr, SecretStr
 
 SQLITE_DB_NAME = "mydb.db"
 
+# схема автентифікації/авторизації за допомогою тільки логіна (email або username) та пароля
 security = HTTPBasic()
 # схема автентифікації/авторизації за допомогою токена
 # URL ендпоінта для отримання токена - http://127.0.0.1:8000/token
