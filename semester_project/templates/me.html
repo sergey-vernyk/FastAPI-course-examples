@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Current User Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #444;
+        }
+
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 6px;
+            max-width: 600px;
+            overflow-x: auto;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Current User Info</h1>
+    <pre id="userInfo">Loading...</pre>
+    <button onclick="logout()">Logout</button>
+
+    <script>
+        async function loadUser() {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                window.location.href = "/login";
+                return;
+            }
+
+            const res = await fetch("/me", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById("userInfo").innerText = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("userInfo").innerText = data.detail;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/login";
+        }
+
+        loadUser();
+    </script>
+</body>
+
+</html>

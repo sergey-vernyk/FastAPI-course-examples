@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #444;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 15px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label>Email:
+            <input type="text" name="username" required>
+        </label>
+        <label>Password:
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Login</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams();
+            for (const [key, value] of formData) {
+                params.append(key, value);
+            }
+
+            const res = await fetch("/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: params.toString()
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem("accessToken", data.access_token);
+                window.location.href = "/me-page";
+            } else {
+                document.getElementById("result").innerText = data.detail;
+            }
+        });
+    </script>
+</body>
+
+</html>
